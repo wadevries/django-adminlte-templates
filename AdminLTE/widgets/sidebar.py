@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.template import loader, Context
+from django.utils.html import format_html
 
 import re
+
+from django.utils.safestring import mark_safe
 
 from . import WidgetBase
 from . import FontAwesomeIcon as FAIcon
@@ -100,16 +103,16 @@ class SidebarMenuItem(SidebarItem):
         if self.label:
             return self.label
         elif self.children:
-            return '<i class="fa fa-angle-left pull-right"></i>'
+            return format_html('<i class="fa fa-angle-left pull-right"></i>')
         else:
             return ""
 
     def get_name(self):
-        return '<span>%s</span>' % self.name
+        return format_html('<span>{}</span>', self.name)
 
     def to_html(self):
         if self.is_header:
-            return '<li class="header">%s</li>' % self.name
+            return format_html('<li class="header">{}</li>', self.name)
 
         if self.has_children():
             children_html = "".join([
@@ -120,12 +123,12 @@ class SidebarMenuItem(SidebarItem):
         else:
             children_html = ''
 
-        return ''.join([
-            '<li class="%s">' % self.get_li_classes(),
-            '<a href="%s">%s%s%s</a>' % (self.href, self.get_icon(), self.get_name(), self.get_label()),
+        return mark_safe(''.join([
+            format_html('<li class="{}">', self.get_li_classes()),
+            format_html('<a href="{}">{}{}{}</a>', self.href, mark_safe(self.get_icon()), self.get_name(), self.get_label()),
             children_html,
             '</li>',
-        ])
+        ]))
 
 class SimpleSidebarMenuItem(SidebarMenuItem):
     def __init__(self, icon=None, icon_color=None, label=None, **kwargs):
@@ -227,7 +230,7 @@ class Sidebar(object):
             widget.set_request(request)
 
     def to_html(self):
-        return ''.join([
+        return mark_safe(''.join([
             '<section class="sidebar">',
 
             ''.join(widget.to_html() for widget in self.widgets_before_menu if not widget.is_hidden()),
@@ -239,4 +242,4 @@ class Sidebar(object):
             ''.join(widget.to_html() for widget in self.widgets_after_menu if not widget.is_hidden()),
 
             '</section>',
-        ])
+        ]))

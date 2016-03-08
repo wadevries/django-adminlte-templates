@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.utils.html import format_html
+
 
 class _ContainsMeta(type):
     def __contains__(self, item):
@@ -71,7 +73,7 @@ class FontAwesomeIcon(WidgetBase):
             self.classes.append("text-%s" % color)
 
     def to_html(self):
-        return '<i class="fa fa-%s %s"></i>' % (self.name, " ".join(self.classes))
+        return format_html('<i class="fa fa-{} {}"></i>', self.name, " ".join(self.classes))
 
 class Label(WidgetBase):
     def __init__(self, data, type=None, **kwargs):
@@ -82,4 +84,4 @@ class Label(WidgetBase):
             self.classes.append("label-%s" % type)
 
     def to_html(self):
-        return '<span class="label %s">%s</span>' % (" ".join(self.classes), self.data)
+        return format_html('<span class="label {}">{}</span>', " ".join(self.classes), self.data)
